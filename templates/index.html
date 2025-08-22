@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sentiment Analyzer</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #e47be4ff, #bb82c5ff, #b39ddb);
+      background-size: 400% 400%;
+      animation: gradientBG 12s ease infinite;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .container {
+      width: 90%;
+      max-width: 850px;
+      margin: 3rem auto;
+      padding: 2.5rem;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      animation: fadeIn 1.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      text-align: center;
+      color: #9641afff;
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      font-weight: bold;
+      color: #6a1b9a;
+    }
+
+    textarea {
+      width: 100%;
+      height: 130px;
+      padding: 8px;
+      border: 2px solid #c570d4ff;
+      border-radius: 15px;
+      font-size: 16px;
+      resize: none;
+      transition: all 0.3s ease;
+      margin-top: 0.5rem;
+    }
+    textarea:focus {
+      outline: none;
+      border-color: #8e24aa;
+      box-shadow: 0 0 8px rgba(142,36,170,0.4);
+    }
+
+    input[type="file"] {
+      margin-top: 0.8rem;
+    }
+
+    button {
+      display: inline-block;
+      background: linear-gradient(135deg, #ab47bc, #8e24aa);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      margin-top: 1rem;
+      border-radius: 12px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.3s ease;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      background: linear-gradient(135deg, #8e24aa, #6a1b9a);
+    }
+
+    .result-container {
+      margin-top: 2.5rem;
+      padding: 1.5rem;
+      border-radius: 16px;
+      background: #faf7fc;
+      box-shadow: inset 0 0 6px rgba(0,0,0,0.05);
+    }
+
+    .result-container h3 {
+      margin-top: 0;
+      color: #6a1b9a;
+      margin-bottom: 1rem;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      margin-bottom: 0.8rem;
+      padding: 0.8rem 1rem;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    /* Sentiment badges */
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      margin-left: 8px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+    .Positive {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+    .Negative {
+      background: #ffebee;
+      color: #c62828;
+    }
+    .Neutral {
+      background: #eeeeee;
+      color: #424242;
+    }
+
+    .error {
+      color: #d32f2f;
+      font-weight: bold;
+      margin-top: 1rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Sentiment Analyzer</h1>
+    <form method="POST" action="/" enctype="multipart/form-data">
+      <!-- Option 1: Enter raw text -->
+      <label for="text">Enter Text:</label><br>
+      <textarea name="text" placeholder="Type or paste feedback here...">{{ user_input }}</textarea>
+      <br><br>
+
+      <!-- Option 2: Upload file -->
+      <label for="file">Or Upload a Feedback Document (.txt, .csv, .pdf):</label><br>
+      <input type="file" name="file" accept=".txt,.csv,.pdf">
+      <br><br>
+
+      <button type="submit">🔍 Analyze</button>
+    </form>
+
+    {% if error %}
+      <p class="error">{{ error }}</p>
+    {% endif %}
+
+    {% if sentiment_summary %}
+    <div class="result-container">
+      <h3>📊 Sentiment Summary</h3>
+      <ul>
+        {% for sentiment, percent in sentiment_summary.items() %}
+        <li>
+          <strong>{{ sentiment }}</strong>: {{ percent }}%
+          <span class="badge {{ sentiment }}">{{ sentiment }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+
+      <h3>📝 Detailed Sentiment Analysis</h3>
+      <ul>
+        {% for sentence, sent in detailed_sentiments %}
+        <li>
+          <strong>{{ sentence }}</strong><br>
+          <span class="badge {{ sent }}">{{ sent }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+
+      <!-- ✅ Clear Results button -->
+      <form action="/" method="get" style="margin-top: 1.5rem; text-align:center;">
+        <button type="submit">❌ Clear Results</button>
+      </form>
+    </div>
+    {% endif %}
+  </div>
+</body>
+</html>
